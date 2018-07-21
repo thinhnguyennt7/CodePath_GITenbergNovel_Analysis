@@ -1,4 +1,3 @@
-=====================
 Frankenstein; Or, The Modern Prometheus
 =====================
 
