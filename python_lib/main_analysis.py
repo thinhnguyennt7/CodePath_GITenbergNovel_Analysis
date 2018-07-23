@@ -1,4 +1,5 @@
 from heapq import heappush, heappop
+import re
 class Frankenstein:
 
     def __init__(self, fileName):
@@ -20,7 +21,7 @@ class Frankenstein:
                     else:
                         self.wordMap[word] = 1
             print ("List word")
-            print (self.wordMap)
+            # print (self.wordMap)
             print ("################")
 
     def getTotalNumberOfWord(self, textFile):
@@ -35,35 +36,31 @@ class Frankenstein:
     def splitString(self, sentence):
         wordList = []
         temp = ''
-        # Remove new line character
+        # Remove new line character and avoid white empty white space
         sentence = sentence.replace('\n', '')
+        sentence = sentence.replace('\r', '')
+        sentence = re.sub(r"[-()\"#/@;:<>{}`+=~|.!?,]", "", sentence)
         for char in sentence:
-            if char == ' ' and temp != '':
-                wordList.append(temp)
+            if char == ' ' and (temp != ' '):
+                if (temp != ''):
+                    wordList.append(temp)
                 temp = ''
             else:
                 temp += char
-        if temp and temp != '\n':
+        if temp and (temp != '\n' or '' or ' '):
             wordList.append(temp)
         return wordList
 
-    def get20MostFrequentWords(self):
-        mostFreq = 20
+    def get20MostFrequentWords(self, mostFreq):
         arr = []
-        output = []
         for key in self.wordMap:
             # Push to arr using min heap
-            # heappush(arr, [-self.wordMap[key], key])
             heappush(self.frequenceWords, [-self.wordMap[key], key])
-        out = [heappop(self.frequenceWords) for _ in range(mostFreq)]
-        # Reformat the output
-        for i in out:
-            i[0] = i[0]*(-1) # Change to positive value
-            output.append([i[1], i[0]])
-        return output
+            heappush(arr, [-self.wordMap[key], key])
+        out = [heappop(arr) for _ in range(mostFreq)]
+        return self.reformatOutput(out)
 
-    def get20MostInterestingFrequentWords(self, textFile, filterVal):
-        mostFreq = 20
+    def get20MostInterestingFrequentWords(self, textFile, filterVal, mostFreq):
         commonList = []
         values = []
         commandText = open(textFile, 'r')
@@ -73,17 +70,30 @@ class Frankenstein:
                 break
             if len(commonList) == filterVal:
                 break
-            commonList.append(line)
+            commonList.append(line.lower())
 
         for ele in self.frequenceWords:
-            if (ele[1] not in commonList):
+            if len(values) == mostFreq:
+                break
+            if ele[1].lower() not in commonList:
                 values.append(ele)
+        return self.reformatOutput(values)
 
-        return values
+    def reformatOutput(self, array):
+        output = []
+        for ele in array:
+            ele[0] = ele[0]*(-1) # CHANGE VALUE TO POSITIVE
+            output.append([ele[1], ele[0]])
+        return output
 
-
-    def get20LeastFrequentWords(self):
-        return
+    def get20LeastFrequentWords(self, mostFreq):
+        out = []
+        for ele in self.frequenceWords:
+            if len(out) == mostFreq:
+                break
+            if ele[0] == -1:
+                out.append(ele)
+        return self.reformatOutput(out)
 
     def getFrequencyOfWord(self):
         return
@@ -100,13 +110,15 @@ class Frankenstein:
     def findClosestMatchingQuote(self, str):
         return
 
-# Driver
+
+# DRIVER
 if __name__ == "__main__":
     # Initilize intial value
     # text = "frankenstein.txt"
     text = 'test.txt'
     common = 'commonUS.txt'
     filterVal = 100
+    mostFreq = 20
 
     # Instantiated
     analysis = Frankenstein(text)
@@ -118,7 +130,10 @@ if __name__ == "__main__":
     print ("Total Unique Words: ", analysis.getTotalUniqueWords())
 
     # Most 20 frequent words
-    print ("Most 20 Frequency Words: ", analysis.get20MostFrequentWords())
+    print ("Most 20 Frequency Words: ", analysis.get20MostFrequentWords(mostFreq))
 
     # Most 20 interesting frequent words
-    print ("Most 20 Interesting Frequence Words: ", analysis.get20MostInterestingFrequentWords(common, filterVal))
+    print ("Most 20 Interesting Frequence Words: ", analysis.get20MostInterestingFrequentWords(common, filterVal, mostFreq))
+
+    # Least 20 Frequence Words
+    print ("Least 20 Frequence Words: ", analysis.get20LeastFrequentWords(mostFreq))
