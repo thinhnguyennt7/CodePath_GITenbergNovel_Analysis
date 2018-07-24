@@ -20,9 +20,6 @@ class Frankenstein:
                         self.wordMap[word] += 1
                     else:
                         self.wordMap[word] = 1
-            print ("List word")
-            # print (self.wordMap)
-            print ("################")
 
     def getTotalNumberOfWord(self, textFile):
         count = 0
@@ -95,7 +92,35 @@ class Frankenstein:
                 out.append(ele)
         return self.reformatOutput(out)
 
-    def getFrequencyOfWord(self):
+    def splitByChapter(self, file):
+        text = open(file, 'r')
+        currLine = 1
+        texts = ''
+        chapter = []
+        soLama = {
+            "I": 1,
+            "II": 2,
+            "III": 3,
+            "IV": 4,
+            "V": 5,
+            "VI": 6,
+            "VII": 7,
+            "VIII": 8,
+            "IX": 9,
+            "X": 10
+        }
+        while True:
+            line = text.readline()
+            # If no line then break
+            if not line:
+                break
+            texts += line
+        return texts
+            # if 'CHAPTER I.' in line:
+            #     print (currLine)
+            # currLine += 1
+
+    def getFrequencyOfWord(self, word):
         return
 
     def getChapterQuoteAppears(self, quote):
@@ -119,6 +144,7 @@ if __name__ == "__main__":
     common = 'commonUS.txt'
     filterVal = 100
     mostFreq = 20
+    word = 'promise'
 
     # Instantiated
     analysis = Frankenstein(text)
@@ -137,3 +163,6 @@ if __name__ == "__main__":
 
     # Least 20 Frequence Words
     print ("Least 20 Frequence Words: ", analysis.get20LeastFrequentWords(mostFreq))
+
+    # Get Frequence Of Word in each chapter
+    print ("Frequence Words Chapters: ", analysis.splitByChapter(text))
